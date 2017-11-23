@@ -10,27 +10,79 @@ import time
 import sys
 import math
 
+WIDTH = 384
+HEIGHT = 288
+
+
+
+
+
+
+def chromitize_video():
+	new_video = []
+	for f in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
+		new_frame = np.zeros(shape = (HEIGHT,WIDTH,3))
+		cap.set(1,f)
+		ret, frame = cap.read()
+		if ret:
+			for r in range(HEIGHT):
+				for c in range(WIDTH):
+					pixel = frame[r, c]
+					#print(pixel[0])
+					#print(pixel[1])
+					#print(pixel[2])
+					r,g = chromatize(pixel)
+					print(r)
+					print(g)
+
+					new_frame[r, c,0] = (r)
+					new_frame[r,c,1] =(g)
+					new_video.append(new_frame)
+		return new_video
+		    				
+		    				
+
+def test_chrom(frame):
+	cv2.imshow('frame', frame)
+	cv2.waitKey(0)
+	#if cv2.waitKey(1) & 0xFF == ord('q'):
+	
+
+
+
+		    	
 
 def chromatize(pixel):
-	for f in range(NUMBER_OF_FRAMES):
-    	b,g,r = cv2.split(bgr_img)
+	R = pixel[0]
+	G = pixel[1]
+	B = pixel[2]
 
-    	r = r/r+g+b
-    	b = 
+	#R, B, G = cv2.split(pixel)
+	r = int(R/(R + G + B))
+	g = int(G/(R + G + B) )
+	#return [r, g]
+	#val = np.array([r, g])
+	
+	
+	return r, g	
+
+
+
+    	 
     	#rgb_img = cv2.merge([r,g,b])
 
 def chrom_bin(pixel):
 	return
 
 class CHistogram(object):
-	def __init__(self, column, frame)
+	def __init__(self, column, frame):
 		global WIDTH, HEIGHT
 		self.x = log(WIDTH, 2)
 		self.y = log(HEIGHT, 2)
 		#np.zeros( (x,y))
 		self.histogram = [[0] * x for i in range(y)]
-		self.column = 0
-		self.frame
+		self.column = column
+		self.frame = frame
 
 
 	def reduce_histogram(self):
@@ -44,7 +96,7 @@ class CHistogram(object):
 
 	def column_frame_histogram(self, column, frame):
 		for pixel in column:
-			self.histogram[pixel[0]][pixel[1]]++
+			self.histogram[pixel[0]][pixel[1]] =+ 1
 
 
 def histo_difference(t1, t2):
@@ -54,10 +106,7 @@ def histo_difference(t1, t2):
 			value += min(t1[i][j], t2[i][j])
 	return value
 
-def colour_transformation():
-	global WIDTH, HEIGHT
-	for r in range HEIGHT
-		for c 
+		
 
 def create_chistograms():
 	histograms = []
@@ -72,7 +121,7 @@ def create_histo_STI(histograms):
 	y = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))			#frames
 	for c in range(x):
 		for t in range(y): 
-		hist = Hist(c, t)
+			hist = Hist(c, t)
 
 
 
@@ -105,10 +154,13 @@ def build_column_STI():
             cap.set(1, t)
             ret, frame = cap.read()
             if ret: 
+            	frame[ :, t] =  temp[: , c]
+            	STIlist = STIlist.append(frame)  
 
-            frame[ :, t] =  temp[: , c] 
-        STIlist = STIlist.append(frame)  
 
-
+cap = cv2.VideoCapture("A2o_wipes.mp4")
+new_video = chromitize_video()
+for f in new_video:
+	test_chrom(f)
 
 
