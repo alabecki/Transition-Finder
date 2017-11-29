@@ -47,37 +47,72 @@ def chromitize_video():
 		#print("Frame %d ****************************************************************" % f)
 		ret, frame = cap.read()
 		if ret:
-			new_frame = np.zeros(shape = (HEIGHT,WIDTH,3))
+			new_frame = np.zeros(shape = (HEIGHT,WIDTH, 3))
 			frame = cv2.resize(frame, (32, 32)) 
-			#cv2.imshow('frame', frame)
+			cv2.imshow('old frame', frame)
 			f += 1
 		for row in range(HEIGHT):
-		#print("Row: %d" % row)
 			for col in range(WIDTH):
-				#print("Col: %d" % col)
+				
 				pixel = frame[row, col]
 				R = frame[row, col, 0]
 				G = frame[row, col, 1]
 				B = frame[row, col, 2]
-			#	print(R, G, B)
 				pixel = [R, G, B]
-				#print(pixel[0])
-				#print(pixel[1])
-				#print(pixel[2])
 				[r,g, b] = chromatize(pixel)
-				#print("r: %f"% r)
-				#print("g: %f"%g)
-				#print(b)
+			
 				new_frame[row, col] = [r, g, b]
-				#new_frame[r, c,b] = (r)
-				#new_frame[r,c,1] =(g)
-		#new_video.append(new_frame)
+		cv2.imshow("new_frame", new_frame)
+		new_video.append(new_frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
 
 			cap.release()
 			cv2.destroyAllWindows()
 	return new_video
+
+def create_histogram(new_video, f, col):
+	histo = CHistogram(col, f)
+	frame = new_video[f]
+	for row in range(32):
+
+		pixel = frame[row, col]
+		r = pixel[0]
+		g = pixel[1]
+		b = pixel[2]
+		r = chrom_bin(r)
+		g = chrom_bin(g)
+		b = chrom_bin(b)
+		print("Binned values:")
+		print(r, g, b)
+		histo.histogram[r][g] =+ 1
+		print("Current Value of %f %f" % r, g)
+		print(histo.histogram[r][g])
+	#for i in range(6):
+	#	for j in range(6):
+	#		histo.histogram[i][j] = histo.histogram[i][j]/32
+	#check if adds up to 1
+	total = 0
+	print("Histogram:")
+	for i in range(6):
+		for j in range(6):
+			print(histo.histogram[i][j])
+			total += histo.histogram[i][j]
+	print("Total %f" % total)
+	return histo
+
+
+def create_histograms(new_video):
+	histogram_matrix = [[0] * len(new_video) for i in range(32)]
+	for f in range(len(new_video)):
+		frame = new_video[f]
+		for col in range(32):
+			new = create_histogram(new_video, f, col)
+			histogram_matrix[f][col] = new
+	return histogram_matrix 
+
+
+
 
   				
 
@@ -87,44 +122,42 @@ def test_chrom(frame):
 	#if cv2.waitKey(1) & 0xFF == ord('q'):
 	
 
-
-
 		    	
-
 def chromatize(pixel):
 	R = pixel[0]
 	G = pixel[1]
 	B = pixel[2]
-	#print("R: %f" % R)
-	#print("G: %f" % G)
 
+	denom = float(R) + float(G) + float(B) + 0.00001
 	#R, B, G = cv2.split(pixel)
-	r = (R/(R + G + B + 0.0001))
-	g = (G/(R + G + B + 0.0001) )
-	b = (B/(R + G + B + 0.0001))
+	r = R/denom
+	g = G/denom
+	b = B/denom
+
 	return [r, g, b]
 	#val = np.array([r, g])
 	
 	
-	#return r, g	
 
-
-
-    	 
-    	#rgb_img = cv2.merge([r,g,b])
-
-
-
-def chrom_bin(pixel):
-	return
+def chrom_bin(value):
+	if value < 0.17: 
+		return 0
+	if value < 0.33:
+		return 1
+	if value < 0.50:
+		return 2
+	if value < 0.66:
+		return 3
+	if value < 0.83:
+		return 4
+	else:
+		return 5
 
 class CHistogram(object):
 	def __init__(self, column, frame):
-		global WIDTH, HEIGHT
-		self.x = log(WIDTH, 2)
-		self.y = log(HEIGHT, 2)
+		self.length = 6
 		#np.zeros( (x,y))
-		self.histogram = [[0] * x for i in range(y)]
+		self.histogram = [[0] * 6 for i in range(6)]
 		self.column = column
 		self.frame = frame
 
@@ -205,6 +238,8 @@ def build_column_STI():
 cap = cv2.VideoCapture("A2o_wipes.mp4")
 #play_video()
 new_video = chromitize_video()
+histo_matrix = create_histograms(new_video)
+
 #for f in new_video:
 #	test_chrom(f)
 
