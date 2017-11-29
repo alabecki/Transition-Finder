@@ -22,9 +22,7 @@ def play_video():
 	while True:
 	    ret, frame = cap.read()
 	    if ret:
-
 	    #gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
 		    cv2.imshow('frame', frame)
 		    f += 1
 		    print(f)
@@ -64,10 +62,10 @@ def chromitize_video():
 		new_video.append(new_frame)
 		if cv2.waitKey(1) & 0xFF == ord('q'):
 			break
-
 			cap.release()
 			cv2.destroyAllWindows()
 	return new_video
+
 
 def create_histogram(new_video, f, col):
 	histo = CHistogram(col, f)
@@ -100,9 +98,14 @@ def create_histogram(new_video, f, col):
 
 
 # This function gives us a 2d matrix of 6x6 histograms. There is a row for each frame 
-# in video and and a column for each column. Each histogram itself is an object with 
-# a histogram attribute (I now regret making it a class, but maybe it will proove useful toward
-# the end). So you have to use "<name>.histogram[i][j]" to acess its corodinates.   
+# in video and and a column for each column. 
+# I thought we would begin by just using the {r,g} values for the histograms and see how that works out
+# (but we will need to change things to reflect the fact that open cv orders things BGR)
+# If you want to access the the 12th column of the 100th frame you would use histogram_matrix[100][12]
+# Each histogram itself is an object with a histogram attribute (I now regret making it a class, but 
+# maybe it will proove useful toward the end).
+# So you have to use "<name>.histogram[i][j]" to acess its corodinates.
+# The values for each coordinate in a histogram is a float in (0, 1) and each histogram sums up to 1.   
 
 def create_histograms(new_video):
 	#histogram_matrix = [[0] * len(new_video) for i in range(32)]
@@ -114,28 +117,22 @@ def create_histograms(new_video):
 			histogram_matrix[f][col] = new
 	print("Histograms created \n")
 	return histogram_matrix 
-
-
   				
 
 def test_chrom(frame):
 	cv2.imshow('frame', frame)
 	cv2.waitKey(0)
 	#if cv2.waitKey(1) & 0xFF == ord('q'):
-	
-
 		    	
 def chromatize(pixel):
 	R = pixel[0]
 	G = pixel[1]
 	B = pixel[2]
-
 	denom = float(R) + float(G) + float(B) + 0.00001
 	#R, B, G = cv2.split(pixel)
 	r = R/denom
 	g = G/denom
 	b = B/denom
-
 	return [r, g, b]
 	#val = np.array([r, g])
 	
