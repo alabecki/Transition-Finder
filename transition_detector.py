@@ -99,6 +99,11 @@ def create_histogram(new_video, f, col):
 	return histo
 
 
+# This function gives us a 2d matrix of 6x6 histograms. There is a row for each frame 
+# in video and and a column for each column. Each histogram itself is an object with 
+# a histogram attribute (I now regret making it a class, but maybe it will proove useful toward
+# the end). So you have to use "<name>.histogram[i][j]" to acess its corodinates.   
+
 def create_histograms(new_video):
 	#histogram_matrix = [[0] * len(new_video) for i in range(32)]
 	histogram_matrix = [[0] * 32 for i in range(len(new_video))]
@@ -159,6 +164,9 @@ class CHistogram(object):
 		self.frame = frame
 
 
+
+
+
 	def reduce_histogram(self):
 		sum = 0
 		for i in range(self.x):
@@ -180,13 +188,7 @@ def histo_difference(t1, t2):
 			value += min(t1[i][j], t2[i][j])
 	return value
 
-		
-
-def create_chistograms():
-	histograms = []
-	for c in range(WIDTH):
-		for t in range(int(cap.get(cv2.CAP_PROP_FRAME_COUNT))):
-			hist = CHistogram(c, t)
+	
 
 
 
