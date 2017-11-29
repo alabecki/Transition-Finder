@@ -35,8 +35,6 @@ def play_video():
 	cv2.destroyAllWindows()
 
 
-
-
 def chromitize_video():
 	new_video = []
 	f = 0
@@ -75,7 +73,6 @@ def create_histogram(new_video, f, col):
 	histo = CHistogram(col, f)
 	frame = new_video[f]
 	for row in range(32):
-
 		pixel = frame[row, col]
 		r = pixel[0]
 		g = pixel[1]
@@ -83,35 +80,35 @@ def create_histogram(new_video, f, col):
 		r = chrom_bin(r)
 		g = chrom_bin(g)
 		b = chrom_bin(b)
-		print("Binned values:")
-		print(r, g, b)
-		histo.histogram[r][g] =+ 1
-		print("Current Value of %f %f" % r, g)
-		print(histo.histogram[r][g])
-	#for i in range(6):
-	#	for j in range(6):
-	#		histo.histogram[i][j] = histo.histogram[i][j]/32
-	#check if adds up to 1
-	total = 0
-	print("Histogram:")
+		#print("Binned values:")
+		#print(r, g, b)
+		histo.histogram[r][g] += 1
+		#print("Current Value of %f, %f" % (r, g))
+		#print(histo.histogram[r][g])
 	for i in range(6):
 		for j in range(6):
-			print(histo.histogram[i][j])
-			total += histo.histogram[i][j]
-	print("Total %f" % total)
+			histo.histogram[i][j] = histo.histogram[i][j]/32
+	#check if adds up to 1
+	total = 0
+	#print("Histogram:")
+	#for i in range(6):
+	#	for j in range(6):
+	#		print(histo.histogram[i][j])
+	#		total += histo.histogram[i][j]
+	#print("Total %f" % total)
 	return histo
 
 
 def create_histograms(new_video):
-	histogram_matrix = [[0] * len(new_video) for i in range(32)]
+	#histogram_matrix = [[0] * len(new_video) for i in range(32)]
+	histogram_matrix = [[0] * 32 for i in range(len(new_video))]
 	for f in range(len(new_video)):
 		frame = new_video[f]
 		for col in range(32):
 			new = create_histogram(new_video, f, col)
 			histogram_matrix[f][col] = new
+	print("Histograms created \n")
 	return histogram_matrix 
-
-
 
 
   				
@@ -138,7 +135,6 @@ def chromatize(pixel):
 	#val = np.array([r, g])
 	
 	
-
 def chrom_bin(value):
 	if value < 0.17: 
 		return 0
@@ -152,6 +148,7 @@ def chrom_bin(value):
 		return 4
 	else:
 		return 5
+
 
 class CHistogram(object):
 	def __init__(self, column, frame):
@@ -202,9 +199,6 @@ def create_histo_STI(histograms):
 
 
 
-
-
-
 def open_video(btn):
         global file     
         frame = np.zeros(shape = (width, height))
@@ -217,8 +211,6 @@ def open_video(btn):
         app.reloadImageData("Video", img, fmt="mpg")
         cap.release()
         return
-
-
 
 
 
