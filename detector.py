@@ -61,9 +61,6 @@ def colsti():
                 
                         f += 1
                      
-                                        
-
-
         cv2.imshow("STI", midcol)
         cv2.waitKey(0)
         return 
@@ -89,17 +86,19 @@ def chromitize_video():
                     f += 1
                     for row in range(HEIGHT):
                         for col in range(WIDTH):
-                                
-                                pixel = frame[row, col]
-                                R = frame[row, col, 0]
-                                G = frame[row, col, 1]
-                                B = frame[row, col, 2]
-                                pixel = [R, G, B]
-                                [r,g, b] = chromatize(pixel)
-                        
-                                new_frame[row, col] = [r, g, b]
+                            pixel = frame[row, col]
+                            R = frame[row, col, 0]
+                            G = frame[row, col, 1]
+                            B = frame[row, col, 2]
+                            pixel = [R, G, B]
+                            [r,g, b] = chromatize(pixel)
+                            new_frame[row, col] = [r, g, b]
                     cv2.imshow("new_frame", new_frame)
                     new_video.append(new_frame)
+                    if cv2.waitKey(1) & 0xFF == ord('q'):
+                        cap.release()
+                        cv2.destroyAllWindows()
+                        break
         cap.release()
         cv2.destroyAllWindows()
         return new_video
@@ -151,8 +150,8 @@ def create_histograms(new_video):
         for f in range(len(new_video)):
                 frame = new_video[f]
                 for col in range(32):
-                        new = create_histogram(new_video, f, col)
-                        histogram_matrix[f][col] = new
+                    new = create_histogram(new_video, f, col)
+                    histogram_matrix[f][col] = new
         print("Histograms created \n")
         return histogram_matrix 
                                 
@@ -190,14 +189,13 @@ def chrom_bin(value):
                 return 5
 
 
-def intersectionHist(histogram_matrix):
-    length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+def intersectionHist(histogram_matrix, length):
     STI = np.zeros(shape = (32,length,3))
     for c in range(32):
         for f in range(length):
             STI[c,f] = hist_difference(c,f, length, histogram_matrix)
-            #print(STI[c,f])
-    cv2.imshow("STI", STI)
+         #   print(STI[c,f])
+    cv2.imshow('STI', STI)
     cv2.waitKey(0)
 
     return STI
@@ -229,41 +227,6 @@ class CHistogram(object):
 
 
 
-
-        def reduce_histogram(self):
-                sum = 0
-                for i in range(self.x):
-                        for j in range(self.y):
-                                sum += self.histogram[i][j]
-                for i in range(self.x):
-                        for j in range(self.y):
-                                self.histogram[i][j] = self.histogram[i][j]/sum
-
-        def column_frame_histogram(self, column, frame):
-                for pixel in column:
-                        self.histogram[pixel[0]][pixel[1]] =+ 1
-
-
-def histo_difference(t1, t2):
-        value = 0
-        for i in range(t1.width):
-                for j in range(t.height):
-                        value += min(t1[i][j], t2[i][j])
-        return value
-
-        
-
-
-
-def create_histo_STI(histograms):
-        x = height                                                                              #columns
-        y = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))                      #frames
-        for c in range(x):
-                for t in range(y): 
-                        hist = Hist(c, t)
-
-
-
 def open_video(btn):
         global file     
         frame = np.zeros(shape = (width, height))
@@ -279,26 +242,17 @@ def open_video(btn):
 
 
 
-def build_column_STI():
-    global NUMBER_OF_FRAMES
-    STIlist = []
-    for c in range(width):
-        frame = np.zeros(shape = (NUMBER_OF_FRAMES, height))
-        for t in range(NUMBER_OF_FRAMES):
-            cap.set(1, t)
-            ret, frame = cap.read()
-            if ret: 
-                frame[ :, t] =  temp[: , c]
-                STIlist = STIlist.append(frame)  
+
 
 
 cap = cv2.VideoCapture("A2o_wipes.mp4")
 #play_video()
 #colsti()
+length = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
 
 new_video = chromitize_video()
 histo_matrix = create_histograms(new_video)
-result = intersectionHist(histo_matrix)
+result = intersectionHist(histo_matrix, length)
 
 
 #for f in new_video:
