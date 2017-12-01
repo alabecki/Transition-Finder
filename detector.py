@@ -300,7 +300,6 @@ def exit_program(btn):
     return
 
 
-
 # Executation of the program using the above functions: 
 
 app = gui("Transition Detector")
